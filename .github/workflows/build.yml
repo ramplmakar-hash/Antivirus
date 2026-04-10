@@ -1,17 +1,27 @@
-name: Build
+name: Build EXE
 on: [push]
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Python & PyInstaller
-        run: |
-          pip install pyinstaller
-      - name: Make EXE
-        run: pyinstaller --noconsole --onefile main.py
-      - uses: actions/upload-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          name: Virus-Scanner-EXE
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller --noconsole --onefile main.py
+
+      - name: Save EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyAntivirus-Windows
           path: dist/main.exe
           
