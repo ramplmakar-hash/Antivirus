@@ -1,27 +1,13 @@
-name: Build EXE
+name: Build Android APK
 on: [push]
-
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - name: Build with Buildozer
+        uses: ArtemSerebryakov/buildozer-action@v1
         with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: pip install pyinstaller
-
-      - name: Build with PyInstaller
-        run: pyinstaller --noconsole --onefile main.py
-
-      - name: Save EXE
-        uses: actions/upload-artifact@v4
-        with:
-          name: MyAntivirus-Windows
-          path: dist/main.exe
+          python_version: 3.10
+          build_cmd: android debug
           
