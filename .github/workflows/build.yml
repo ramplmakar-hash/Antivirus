@@ -1,5 +1,5 @@
 name: Build Android APK
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -7,28 +7,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip build-essential git python3 python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
-          sudo apt-get install -y libgstreamer1.0-gstreamer-lite1.0-dev libgstreamer-plugins-base1.0-dev
-          pip3 install --user --upgrade buildozer cython virtualenv
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python_version: '3.10'
 
-      - name: Build with Buildozer
+      - name: Install Buildozer
+        run: |
+          pip install --user buildozer cython==0.29.33
+          sudo apt-get update
+          sudo apt-get install -y build-essential libffi-dev Python3 SDL2 ttf-fonts libssl-dev
+
+      - name: Build APK
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # Генерируем конфиг, если его нет
+          # Если файла настроек нет, создаем его
           if [ ! -f buildozer.spec ]; then
             buildozer init
-            # Настраиваем конфиг под Kivy
             sed -i 's/requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
           fi
-          # Запуск сборки
+          # Магия сборки (может идти долго!)
           buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ShieldMobile-APK
+          name: My-Mobile-Antivirus
           path: bin/*.apk
           
